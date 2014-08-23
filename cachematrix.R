@@ -13,7 +13,10 @@
 #' @docType package
 #' @name cachematrix
 #' @author Craig Struble <strubleca@@yahoo.com>
-NULL
+#' 
+#' NB: This documentation is in roxygen2 format, but won't format as is.
+#' NULLs for bare documentation have been removed for clarity.
+
 
 #' Create a special "matrix" object capable of caching its inverse.
 #' 
@@ -29,27 +32,27 @@ NULL
 #'     
 #' When set is called, any previously set inverse will be cleared (set to NULL).
 #' 
-#' @param x the initial matrix data, defaults to an empty matrix.
+#' @param data the initial matrix data, defaults to an empty matrix.
 #' @return a list with four components that are setter and getter functions.
 #' @examples
-#' x <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
-#' x$get()
-#' x$getinverse()
-#' x$set(matrix(c(2,3,3,4), nrow=2, ncol=2))
-#' x$setinverse(solve(x$get()))
-#' x$getinverse()
-makeCacheMatrix <- function(x = matrix()) {
+#' testMat <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
+#' testMat$get()
+#' testMat$getinverse()
+#' testMat$set(matrix(c(2,3,3,4), nrow=2, ncol=2))
+#' testMat$setinverse(solve(testMat$get()))
+#' testMat$getinverse()
+makeCacheMatrix <- function(data = matrix()) {
     inv <- NULL                # Variable storing the matrix inverse
     
     # Setter "method", which updates the value of this special "matrix" object.
-    set <- function(y) {
-        x <<- y
+    set <- function(newData) {
+        data <<- newData
         inv <<- NULL
     }
     
     # Getter "method", which retrieves the value of this special "matrix"
     get <- function() {
-        x
+        data
     }
     
     # Setter "method", which sets the inverse of this special "matrix"
@@ -79,23 +82,23 @@ makeCacheMatrix <- function(x = matrix()) {
 #' in a special "matrix" object. The inverse is computed only if the
 #' inverse has not been cached previously.
 #' 
-#' @param x the special "matrix" object created using makeCacheMatrix
+#' @param mat the special "matrix" object created using makeCacheMatrix
 #' @param ... additional parameters passed to "solve"
 #' @return the matrix inverse computed by "solve"
 #' @examples
-#' x <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
-#' cacheSolve(x)
-cacheSolve <- function(x, ...) {
-    ## Return a matrix that is the inverse of 'x'
-    inv <- x$getinverse()
+#' testMat <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
+#' cacheSolve(testMat)
+cacheSolve <- function(mat, ...) {
+    ## Return a matrix that is the inverse of 'mat'
+    inv <- mat$getinverse()
     if(!is.null(inv)) { # If this is not NULL, a cached value present.
         message("getting cached data")
         return(inv)
     }
     # Compute the inverse and store it.
-    data <- x$get()
+    data <- mat$get()
     inv <- solve(data, ...)
-    x$setinverse(inv)
+    mat$setinverse(inv)
     inv
 }
 
@@ -103,33 +106,32 @@ cacheSolve <- function(x, ...) {
 #' @name cachematrix-examples
 #' @examples
 #' # Create the initial matrix
-#' x <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
+#' testMat <- makeCacheMatrix(matrix(c(4,3,3,2), nrow=2, ncol=2))
 #' 
 #' # Retrieve its data
-#' x$get()
+#' testMat$get()
 #' 
 #' # Get the inverse. Currently NULL.
-#' x$getinverse()
+#' testMat$getinverse()
 #' 
 #' # Compute and cache the inverse.
-#' cacheSolve(x)
+#' cacheSolve(testMat)
 #' 
 #' # Get the inverse. Should now be the matrix inverse.
-#' x$getinverse()
+#' testMat$getinverse()
 #' 
 #' # Computing again uses the cached result.
-#' cacheSolve(x)
+#' cacheSolve(testMat)
 #' 
 #' # Set the data to a new matrix.
-#' x$set(matrix(c(2,3,3,4), nrow=2, ncol=2))
+#' testMat$set(matrix(c(2,3,3,4), nrow=2, ncol=2))
 #' 
 #' # Look at the new data to make sure its updated.
-#' x$get()
+#' testMat$get()
 #' 
 #' # Get the inverse. Will now be NULL.
-#' x$getinverse()
+#' testMat$getinverse()
 #' 
 #' # Compute and cache the inverse. A second call returns the cached result.
-#' cacheSolve(x)
-#' cacheSolve(x)
-NULL
+#' cacheSolve(testMat)
+#' cacheSolve(testMat)
